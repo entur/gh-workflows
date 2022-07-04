@@ -1,0 +1,20 @@
+name: Validate PR
+
+on:
+  workflow_call:
+    secrets:
+      token:
+        required: true
+
+jobs:
+  pr-title-check:
+    name: Ensure PR title complies with conventional commit conventions
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - uses: amannn/action-semantic-pull-request@91682d013dea3ff257520b9b68c9cb93ced4fe9b
+        env:
+          GITHUB_TOKEN: ${{ secrets.token }}

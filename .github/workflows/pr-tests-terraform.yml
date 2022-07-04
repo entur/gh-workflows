@@ -1,0 +1,60 @@
+name: Terraform Tests, Docs & Compliance
+
+on:
+  workflow_call:
+    inputs:
+      module_dirs: 
+        required: true
+        type: string
+      tf_version:
+        required: false
+        type: string
+        default: 1.1.7
+
+jobs:
+  tf-validate:
+    name: Terraform validate
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: 
+        dir: ${{fromJson(inputs.module_dirs)}}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@ed3a0531877aca392eb870f440d9ae7aba83a6bd # v1.4.0
+        with:
+          terraform_version: ${{ inputs.tf_version }}
+
+      - name: Terraform validation
+        working-directory: ${{ matrix.dir }}
+        run: |
+          terraform init -reconfigure
+          terraform fmt -recursive -check
+          terraform validate
+
+  tf-docs:
+    name: Terraform documentation
+    runs-on: ubuntu-latest
+    needs: tf-validate
+    strategy:
+      matrix: 
+        dir: ${{fromJson(inputs.module_dirs)}}
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Render terraform docs inside the README.md and push changes back to PR branch
+        uses: terraform-docs/gh-actions@f6d59f89a280fa0a3febf55ef68f146784b20ba0 # v1.0.0
+        with:
+          working-dir: ${{ matrix.dir }}
+          output-file: README.md
+          output-method: inject
+          git-push: "true"

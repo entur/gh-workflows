@@ -1,2 +1,2 @@
-# gh-workflows
-Reusable GitHub Actions workflows.
+# Reusable GitHub Actions workflows
+Maintained by Team Plattform.
