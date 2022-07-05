@@ -3,6 +3,13 @@ name: Release Please
 on:
   workflow_call:
     inputs:
+      package_name:
+        required: false
+        type: string
+        default: release
+      release_type:
+        required: true
+        type: string
       version_bumped_files:
         required: false
         type: string
@@ -15,6 +22,6 @@ jobs:
     steps:
       - uses: google-github-actions/release-please-action@0fef4afcc574a384e0d8cee69de13e864b80dc6f # v3.2.7
         with:
-          release-type: terraform-module
-          package-name: release-please-action
+          release-type: ${{ inputs.release_type }}
+          package-name: ${{ inputs.package_name }}
           extra-files: ${{ inputs.version_bumped_files }}
