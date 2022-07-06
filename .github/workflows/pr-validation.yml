@@ -15,6 +15,6 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v2
 
-      - uses: amannn/action-semantic-pull-request@91682d013dea3ff257520b9b68c9cb93ced4fe9b
+      - uses: amannn/action-semantic-pull-request@91682d013dea3ff257520b9b68c9cb93ced4fe9b # renovate: tag=v4.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
