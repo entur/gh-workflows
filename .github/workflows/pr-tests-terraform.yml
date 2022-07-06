@@ -47,7 +47,7 @@ jobs:
         dir: ${{fromJson(inputs.module_dirs)}}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # renovate: tag=v3.0.2
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
