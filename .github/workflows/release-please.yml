@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: google-github-actions/release-please-action@0fef4afcc574a384e0d8cee69de13e864b80dc6f # renovate: tag=v3.2.7
+      - uses: google-github-actions/release-please-action@b910fcea1279e7744f01ca9c82f79502240ccf7c # tag=v3.2.8
         with:
           release-type: ${{ inputs.release_type }}
           package-name: ${{ inputs.package_name }}
