@@ -1,0 +1,63 @@
+name: Helm Release
+
+on:
+  workflow_call:
+    inputs:
+      charts:
+        required: true
+        type: string
+      charts_dir:
+        required: false
+        type: string
+        default: "charts"
+      helm_version:
+        required: false
+        type: string
+        default: "3.2.1"
+
+jobs:
+  helm-release:
+    name: helm release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        chart: ${{fromJson(inputs.charts)}}
+
+    steps:
+      - name: Checkout source code
+        uses: "actions/checkout@v2"
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Conventional Changelog Action
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@9b8c94a880e647cdc3e5071e15e20f0fe210b5ce # v3.13.0
+        with:
+          fallback-version: "0.1.0"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          output-file: ${{ inputs.charts_dir }}/${{ matrix.chart }}/CHANGELOG.md
+          release-count: "1000" # Keep full changelog
+          skip-ci: "true"
+          skip-commit: "false"
+          skip-on-empty: "false"
+          skip-version-file: "false"
+          tag-prefix: "${{ matrix.chart }}-"
+          version-file: ./${{ inputs.charts_dir }}/${{ matrix.chart }}/Chart.yaml
+          version-path: version
+
+  helm-publish:
+    name: helm publish
+    runs-on: ubuntu-latest
+    needs: helm-release
+    steps:
+      - uses: "actions/checkout@v2"
+
+      - name: Publish Helm charts
+        uses: stefanprodan/helm-gh-pages@b43a8719cc63fdb3aa943cc57359ab19118eab3f # v1.5.0
+        with:
+          helm_version: ${{ inputs.helm_version }}
+          index_dir: "."
+          linting: "off"
+          target_dir: "archive"
+          token: ${{ secrets.GITHUB_TOKEN }}

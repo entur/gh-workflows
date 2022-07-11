@@ -1,0 +1,116 @@
+name: Helm PR
+
+on:
+  workflow_call:
+    inputs:
+      charts:
+        required: true
+        type: string
+      charts_dir:
+        required: false
+        type: string
+        default: "charts"
+      helm_version:
+        required: false
+        type: string
+        default: "3.2.1"
+      k8s_version:
+        required: false
+        type: string
+        default: "1.24.0"
+
+jobs:
+  helm-lint:
+    name: helm lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir: ${{fromJson(inputs.charts)}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Helm
+        uses: azure/setup-helm@20d2b4f98d41febe2bbca46408499dbb535b6258 # v3.0
+        with:
+          version: v${{ inputs.helm_version }}
+
+      - name: Helm Lint
+        working-directory: ${{ inputs.charts_dir }}/${{ matrix.dir }}
+        run: |
+          helm lint --strict . --values values-ci-tests.yaml
+
+  helm-unittest:
+    name: helm unittest
+    runs-on: ubuntu-latest
+    needs: helm-lint
+    strategy:
+      matrix:
+        dir: ${{fromJson(inputs.charts)}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v${{ inputs.helm_version }}
+
+      - name: Helm Unit Test
+        working-directory: ${{ inputs.charts_dir }}/${{ matrix.dir }}
+        run: |
+          helm plugin install https://github.com/vbehar/helm3-unittest
+          helm unittest .
+
+  helm-deprecated-check:
+    name: helm deprecated api check
+    runs-on: ubuntu-latest
+    needs: helm-unittest
+    strategy:
+      matrix:
+        dir: ${{fromJson(inputs.charts)}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Helm
+        uses: azure/setup-helm@20d2b4f98d41febe2bbca46408499dbb535b6258 # v3.0
+        with:
+          version: v${{ inputs.helm_version }}
+
+      - name: Setup Pluto
+        uses: FairwindsOps/pluto/github-action@0070fa703641a58ec339a9675aa214ba080ad5d3 # v5.10.2
+
+      - name: Check for depricated apis
+        working-directory: ${{ inputs.charts_dir }}/${{ matrix.dir }}
+        run: |
+          helm template . --values values-ci-tests.yaml | pluto detect - -o wide --target-versions k8s=v${{ inputs.k8s_version }}
+
+  helm-install:
+    name: helm install
+    runs-on: ubuntu-latest
+    needs: helm-deprecated-check
+    strategy:
+      matrix:
+        dir: ${{fromJson(inputs.charts)}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Helm
+        uses: azure/setup-helm@20d2b4f98d41febe2bbca46408499dbb535b6258 # v3.0
+        with:
+          version: v${{ inputs.helm_version }}
+
+      - name: Create kind cluster
+        uses: helm/kind-action@d08cf6ff1575077dee99962540d77ce91c62387d
+        with:
+          node_image: kindest/node:v${{ inputs.k8s_version }}
+
+      - name: Install helm chart
+        working-directory: ${{ inputs.charts_dir }}/${{ matrix.dir }}
+        run: helm install --generate-name --dependency-update --wait --timeout 5m0s . --values values-ci-tests.yaml
