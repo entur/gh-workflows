@@ -1,0 +1,52 @@
+name: Helm Release
+
+on:
+  workflow_call:
+    inputs:
+      charts:
+        required: true
+        type: string
+      charts_dir:
+        required: false
+        type: string
+        default: "charts"
+      helm_version:
+        required: false
+        type: string
+        default: "3.2.1"
+
+jobs:
+  helm-release:
+    name: helm release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        chart: ${{fromJson(inputs.charts)}}
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # renovate: tag=v3.0.2
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Helm Release
+        id: release
+        uses: google-github-actions/release-please-action@v3
+        with:
+          monorepo-tags: true
+          package-name: ${{ matrix.chart }}
+          path: ${{ inputs.charts_dir }}/${{ matrix.chart }}
+          release-type: helm
+          draft-pull-request: true
+
+      - name: Publish Helm charts
+        uses: stefanprodan/helm-gh-pages@b43a8719cc63fdb3aa943cc57359ab19118eab3f # v1.5.0
+        with:
+          helm_version: ${{ inputs.helm_version }}
+          charts: ${{ inputs.charts_dir }}
+          index_dir: "."
+          linting: "off"
+          target_dir: "archive"
+          token: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ steps.release.outputs.releases_created }}
