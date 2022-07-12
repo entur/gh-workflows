@@ -30,34 +30,23 @@ jobs:
           ref: ${{ github.ref }}
           fetch-depth: 0
 
-      - name: Conventional Changelog Action
-        id: changelog
-        uses: TriPSs/conventional-changelog-action@9b8c94a880e647cdc3e5071e15e20f0fe210b5ce # renovate: tag=v3.13.0
+      - name: Helm Release
+        id: release
+        uses: google-github-actions/release-please-action@v3
         with:
-          fallback-version: "0.1.0"
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          output-file: ${{ inputs.charts_dir }}/${{ matrix.chart }}/CHANGELOG.md
-          release-count: "1000" # Keep full changelog
-          skip-ci: "true"
-          skip-commit: "false"
-          skip-on-empty: "false"
-          skip-version-file: "false"
-          tag-prefix: "${{ matrix.chart }}-"
-          version-file: ./${{ inputs.charts_dir }}/${{ matrix.chart }}/Chart.yaml
-          version-path: version
-
-  helm-publish:
-    name: helm publish
-    runs-on: ubuntu-latest
-    needs: helm-release
-    steps:
-      - uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # renovate: tag=v3.0.2
+          monorepo-tags: true
+          package-name: ${{ matrix.chart }}
+          path: ${{ inputs.charts_dir }}/${{ matrix.chart }}
+          release-type: helm
+          draft-pull-request: true
 
       - name: Publish Helm charts
-        uses: stefanprodan/helm-gh-pages@b43a8719cc63fdb3aa943cc57359ab19118eab3f # renovate: tag=v1.5.0
+        uses: stefanprodan/helm-gh-pages@b43a8719cc63fdb3aa943cc57359ab19118eab3f # v1.5.0
         with:
           helm_version: ${{ inputs.helm_version }}
+          charts: ${{ inputs.charts_dir }}
           index_dir: "."
           linting: "off"
           target_dir: "archive"
           token: ${{ secrets.GITHUB_TOKEN }}
+        if: ${{ steps.release.outputs.releases_created }}
