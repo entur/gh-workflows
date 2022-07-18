@@ -109,4 +109,4 @@ jobs:
 
       - name: Install helm chart
         working-directory: ${{ inputs.charts_dir }}/${{ matrix.dir }}
-        run: helm install --generate-name --dependency-update --wait --timeout 5m0s . --values values-ci-tests.yaml
+        run: helm install --debug --generate-name --dependency-update --wait --timeout 5m0s . --values values-ci-tests.yaml
