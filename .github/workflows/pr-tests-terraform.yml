@@ -9,7 +9,7 @@ on:
       validate_dir_override:
         required: false
         type: string
-        default: ${{ inputs.module_dirs }}
+        default: ${{fromJson(inputs.module_dirs)}}
       tf_version:
         required: false
         type: string
