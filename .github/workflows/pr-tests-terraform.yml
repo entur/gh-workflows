@@ -6,6 +6,10 @@ on:
       module_dirs: 
         required: true
         type: string
+      validate_dir_override:
+        required: false
+        type: string
+        default: ${{ inputs.module_dirs }}
       tf_version:
         required: false
         type: string
@@ -17,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix: 
-        dir: ${{fromJson(inputs.module_dirs)}}
+        dir: ${{fromJson(inputs.validate_dir_override)}}
 
     steps:
       - name: Checkout source code
