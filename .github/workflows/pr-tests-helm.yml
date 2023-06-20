@@ -111,9 +111,9 @@ jobs:
         run: |
           helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
           helm repo update
-          helm upgrade --install --set args={--kubelet-insecure-tls} metrics-server metrics-server/metrics-server --namespace kube-system
+          helm install --set args={--kubelet-insecure-tls} metrics-server metrics-server/metrics-server --namespace kube-system
           helm repo add cowboysysop https://cowboysysop.github.io/charts/
-          helm -n kube-system upgrade -install vertical-pod-autoscaler cowboysysop/vertical-pod-autoscaler
+          helm -n kube-system install vertical-pod-autoscaler cowboysysop/vertical-pod-autoscaler
 
       - name: Install helm chart
         working-directory: ${{ inputs.charts_dir }}/${{ matrix.dir }}
