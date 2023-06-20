@@ -107,6 +107,14 @@ jobs:
         with:
           node_image: kindest/node:v${{ inputs.k8s_version }}
 
+      - name: Configure metrics and VPA
+        run: |
+          helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
+          helm repo update
+          helm upgrade --install --set args={--kubelet-insecure-tls} metrics-server metrics-server/metrics-server --namespace kube-system
+          helm repo add cowboysysop https://cowboysysop.github.io/charts/
+          helm -n kube-system upgrade -install vertical-pod-autoscaler cowboysysop/vertical-pod-autoscaler
+
       - name: Install helm chart
         working-directory: ${{ inputs.charts_dir }}/${{ matrix.dir }}
         run: helm install --debug --generate-name --dependency-update --wait --timeout 5m0s . --values values-ci-tests.yaml
