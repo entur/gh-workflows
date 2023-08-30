@@ -79,7 +79,7 @@ jobs:
           version: v${{ inputs.helm_version }}
 
       - name: Setup Pluto
-        uses: FairwindsOps/pluto/github-action@ad7a2381ecb2ba4cca6fdf2e8dddd18660327035 # v5.18.2
+        uses: FairwindsOps/pluto/github-action@82c63f66024467b368dc936ad529a1d7f77536d3 # v5.18.3
 
       - name: Check for depricated apis
         working-directory: ${{ inputs.charts_dir }}/${{ matrix.dir }}
