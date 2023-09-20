@@ -6,11 +6,6 @@ on:
       module_dirs: 
         required: true
         type: string
-      checkov_dir:
-        required: false
-        description: 'Directory with infrastructure code to scan with Checkov'
-        type: string
-        default: ${{fromJson(inputs.module_dirs)}}
       tf_version:
         required: false
         type: string
@@ -66,12 +61,13 @@ jobs:
           
   checkov-scan:
     name: Run policy scan
-
-
     permissions:
       contents: 'read'
       security-events: 'write'
     runs-on: ubuntu-latest
+    strategy:
+      matrix: 
+        dir: ${{fromJson(inputs.module_dirs)}}
 
     steps:
       - uses: actions/checkout@v2
@@ -83,7 +79,7 @@ jobs:
         id: checkov
         uses: bridgecrewio/checkov-action@v12
         with:
-          directory: ${{fromJson(inputs.checkov_dir)}}
+          directory: ${{ matrix.dir }}
           log_level: DEBUG
           soft_fail: true
           framework: terraform
