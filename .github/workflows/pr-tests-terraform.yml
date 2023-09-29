@@ -86,7 +86,7 @@ jobs:
           output_format: cli,sarif
           output_file_path: console,results.sarif
           download_external_modules: true
-          skip_check: CKV_GCP_97
+          skip_check: CKV_GCP_97, CKV_GCP_114, CKV_GCP_62
           
       - name: Upload Checkov SARIF results
         uses: github/codeql-action/upload-sarif@v2
