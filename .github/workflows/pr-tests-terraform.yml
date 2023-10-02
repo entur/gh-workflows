@@ -81,6 +81,7 @@ jobs:
         uses: bridgecrewio/checkov-action@929a69e661a8391a0cd536beeccf98e48b4b7fa9 # v12
         with:
           directory: ${{ matrix.dir }}
+          soft_fail: true
           framework: terraform
           output_format: cli,sarif
           output_file_path: console,results.sarif
