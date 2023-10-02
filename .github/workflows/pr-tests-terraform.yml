@@ -9,7 +9,7 @@ on:
       tf_version:
         required: false
         type: string
-        default: 0.13.2
+        default: 1.1.0
 
 jobs:
   tf-validate:
@@ -74,14 +74,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.1.0
+          terraform_version: ${{ inputs.tf_version }}
           terraform_wrapper: false
       - name: Run Checkov action
         id: checkov
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: ${{ matrix.dir }}
-          log_level: WARNING
           framework: terraform
           output_format: cli,sarif
           output_file_path: console,results.sarif
@@ -89,6 +88,7 @@ jobs:
           skip_check: CKV_TF_1,CKV_K8S_21,CKV_GCP_97,CKV_GCP_114,CKV_GCP_62,CKV2_GCP_13,CKV_GCP_14,CKV_GCP_51,CKV_GCP_52,CKV_GCP_53,CKV_GCP_54,CKV_GCP_55,CKV_GCP_57,CKV_GCP_11,CKV_GCP_56,CKV_GCP_60,CKV_GCP_79,CKV_GCP_108,CKV_GCP_109,CKV_GCP_111,CKV_GCP_6,CKV2_GCP_20,CKV2_GCP_14,CKV2_GCP_15,CKV2_GCP_16,CKV2_GCP_17,CKV2_GCP_7,CKV_AZURE_189
       - name: Upload Checkov SARIF results
         uses: github/codeql-action/upload-sarif@v2
+        # upload results even if the action fails:
         if: success() || failure()
         with:
           sarif_file: results.sarif
