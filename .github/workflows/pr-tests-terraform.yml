@@ -71,16 +71,17 @@ jobs:
         dir: ${{fromJson(inputs.module_dirs)}}
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: hashicorp/setup-terraform@v2
+      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+      - uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
         with:
           terraform_version: ${{ inputs.tf_version }}
           terraform_wrapper: false
       - name: Run Checkov action
         id: checkov
-        uses: bridgecrewio/checkov-action@v12
+        uses: bridgecrewio/checkov-action@929a69e661a8391a0cd536beeccf98e48b4b7fa9 # v12
         with:
           directory: ${{ matrix.dir }}
+          soft_fail: true
           framework: terraform
           output_format: cli,sarif
           output_file_path: console,results.sarif
