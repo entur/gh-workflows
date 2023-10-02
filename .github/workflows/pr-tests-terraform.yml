@@ -3,7 +3,7 @@ name: Terraform Tests, Docs & Compliance
 on:
   workflow_call:
     inputs:
-      module_dirs: 
+      module_dirs:
         required: true
         type: string
       tf_version:
@@ -16,7 +16,7 @@ jobs:
     name: Terraform validate
     runs-on: ubuntu-latest
     strategy:
-      matrix: 
+      matrix:
         dir: ${{fromJson(inputs.module_dirs)}}
 
     steps:
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: tf-validate
     strategy:
-      matrix: 
+      matrix:
         dir: ${{fromJson(inputs.module_dirs)}}
 
     steps:
@@ -58,15 +58,16 @@ jobs:
           output-file: README.md
           output-method: inject
           git-push: "true"
-          
+
   checkov-scan:
     name: Run policy scan
     permissions:
-      contents: 'read'
-      security-events: 'write'
+      contents: read # for actions/checkout to fetch code
+      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
+      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
     runs-on: ubuntu-latest
     strategy:
-      matrix: 
+      matrix:
         dir: ${{fromJson(inputs.module_dirs)}}
 
     steps:
@@ -80,15 +81,14 @@ jobs:
         uses: bridgecrewio/checkov-action@v12
         with:
           directory: ${{ matrix.dir }}
-          log_level: DEBUG
-          soft_fail: true
+          log_level: WARNING
           framework: terraform
           output_format: cli,sarif
           output_file_path: console,results.sarif
           download_external_modules: true
           skip_check: CKV_TF_1,CKV_K8S_21,CKV_GCP_97,CKV_GCP_114,CKV_GCP_62,CKV2_GCP_13,CKV_GCP_14,CKV_GCP_51,CKV_GCP_52,CKV_GCP_53,CKV_GCP_54,CKV_GCP_55,CKV_GCP_57,CKV_GCP_11,CKV_GCP_56,CKV_GCP_60,CKV_GCP_79,CKV_GCP_108,CKV_GCP_109,CKV_GCP_111,CKV_GCP_6,CKV2_GCP_20,CKV2_GCP_14,CKV2_GCP_15,CKV2_GCP_16,CKV2_GCP_17,CKV2_GCP_7
-          
       - name: Upload Checkov SARIF results
         uses: github/codeql-action/upload-sarif@v2
+        if: success() || failure()
         with:
           sarif_file: results.sarif
