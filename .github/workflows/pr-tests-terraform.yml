@@ -82,7 +82,7 @@ jobs:
         with:
           directory: ${{ matrix.dir }}
           soft_fail: true
-          framework: terraform,github_actions
+          framework: {terraform,github_actions}
           output_format: cli,sarif
           output_file_path: console,results.sarif
           download_external_modules: true
