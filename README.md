@@ -17,6 +17,9 @@ Maintained by Team Plattform.
 | CKV_GCP_79 | Ensure latest major version of SQL database | Skipped | Not possible yet |
 | CKV_GCP_108 | Ensure hostnames logged | Skipped | Not using hostnames |
 | CKV_GCP_51, CKV_GCP_52, CKV_GCP_53, CKV_GCP_54, CKV_GCP_55, CKV_GCP_56, CKV_GCP_57, CKV_GCP_109, CKV_GCP_111, CKV2_GCP_13, CKV2_GCP_14, CKV2_GCP_15, CKV2_GCP_16, CKV2_GCP_17 | Ensure log_* is set to * | Skipped | Logging is handled by googles query insight module which is better than postgres logging |
+| CKV_AZURE_136 | Ensure Azure PostgreSQL Flexible Server enables geo-redundant backups | Skipped | Using global disaster recovery backup |
+| CKV_AZURE_128 | Ensure PostgreSQL server enables Threat Detection policy | Skipped | Non-Flexible DB type will be deprecated |
+| CKV_AZURE_130 | Ensure PostgreSQL server enables infrastructure encryption | Skipped | This property is currently still in development and not supported by Microsoft. |
 
 ### module 2
 
