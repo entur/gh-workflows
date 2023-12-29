@@ -86,7 +86,7 @@ jobs:
           output_file_path: console,results.sarif
           download_external_modules: true
       - name: Upload Checkov SARIF results
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         # upload results even if the action fails:
         if: success() || failure()
         with:
