@@ -78,7 +78,7 @@ jobs:
           terraform_wrapper: false
       - name: Run Checkov action
         id: checkov
-        uses: bridgecrewio/checkov-action@69e494e1b28dc24ec680e7ed364e0c227e2026bf # v12
+        uses: bridgecrewio/checkov-action@d26020ae0b8dfdddfab43acf7fdcf3b1f7298246 # v12
         with:
           directory: ${{ matrix.dir }}
           framework: terraform
