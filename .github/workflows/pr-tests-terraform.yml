@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ github.ref }}
           fetch-depth: 0
@@ -47,7 +47,7 @@ jobs:
         dir: ${{fromJson(inputs.module_dirs)}}
 
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
@@ -71,7 +71,7 @@ jobs:
         dir: ${{fromJson(inputs.module_dirs)}}
 
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: hashicorp/setup-terraform@651471c36a6092792c552e8b1bef71e592b462d8 # v3.1.1
         with:
           terraform_version: ${{ inputs.tf_version }}
